@@ -4,14 +4,23 @@ const cors = require("cors");
 const { Server } = require("socket.io");
 
 const app = express();
-app.use(cors());
+app.use(
+  cors({
+    origin: "https://aiwoox.in",
+    methods: "GET,POST",
+    credentials: true,
+  })
+);
 
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
     origin: ["https://aiwoox.in"],
     methods: ["GET", "POST"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
   },
+  transports: ["websocket", "polling"],
 });
 
 const userSocketMap = {}; // Maps userId -> socket.id
