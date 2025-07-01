@@ -119,17 +119,13 @@ io.on("connection", (socket) => {
   // });
 
   //new
-  socket.on("initiate-call", ({ to, offer, from }) => {
-    const callId = `${from}-${to}-${Date.now()}`; // Unique call ID
-    pendingCalls[to] = { callId, from, offer }; // Store pending call
-
+  socket.on("initiate-call", ({ to, offer, callId, from }) => {
+    pendingCalls[to] = { callId, from, offer };
     const targetSocketId = userSocketMap[to];
     if (targetSocketId) {
-      io.to(targetSocketId).emit("incoming-call", {
-        callId,
-        from,
-        offer,
-      });
+      io.to(targetSocketId).emit("incoming-call", { callId, from, offer });
+    } else {
+      console.log(`User ${to} not connected`);
     }
   });
 
