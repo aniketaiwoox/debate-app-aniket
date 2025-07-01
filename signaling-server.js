@@ -23,13 +23,11 @@ const io = new Server(server, {
   transports: ["websocket", "polling"],
 });
 
-// ===== 1. random debate  ===== //
-const randomDebateNamespace = io.of("/random-debate");
 const userSocketMap = {}; // Maps userId -> socket.id
 const callReadyMap = {}; // matchId -> Set of userIds
 
-randomDebateNamespace.on("connection", (socket) => {
-  console.log("User connected to random debate namespace:", socket.id);
+io.on("connection", (socket) => {
+  console.log("User connected:", socket.id);
 
   socket.on("register", (userId) => {
     userSocketMap[userId] = socket.id;
@@ -95,14 +93,10 @@ randomDebateNamespace.on("connection", (socket) => {
       }
     }
   });
-});
 
-// ===== 2. one-on-one debate ===== //
-const oneToOneNamespace = io.of("/one-to-one");
 
-oneToOneNamespace.on("connection", (socket) => {
-  console.log("User connected to one to one namespace:", socket.id);
- 
+
+  
 });
 
 const PORT = 5050;
