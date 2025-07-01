@@ -25,6 +25,8 @@ const io = new Server(server, {
 
 const userSocketMap = {}; // Maps userId -> socket.id
 const callReadyMap = {}; // matchId -> Set of userIds
+//new
+const pendingCalls = {}; // Tracks { mickUserId: { callId, from: aniketUserId, offer } }
 
 io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
@@ -115,6 +117,46 @@ io.on("connection", (socket) => {
   //     io.to(targetSocketId).emit("call-response", { from, accepted });
   //   }
   // });
+
+  //new
+  socket.on("initiate-call", ({ to, offer, from }) => {
+    const callId = `${from}-${to}-${Date.now()}`; // Unique call ID
+    pendingCalls[to] = { callId, from, offer }; // Store pending call
+
+    const targetSocketId = userSocketMap[to];
+    if (targetSocketId) {
+      io.to(targetSocketId).emit("incoming-call", {
+        callId,
+        from,
+        offer,
+      });
+    }
+  });
+
+  socket.on("accept-call", ({ callId, answer }) => {
+    // Find the call by ID
+    const call = Object.values(pendingCalls).find((c) => c.callId === callId);
+    if (call) {
+      // Notify Aniket that Mick accepted
+      const fromSocketId = userSocketMap[call.from];
+      if (fromSocketId) {
+        io.to(fromSocketId).emit("call-accepted", { answer });
+      }
+      delete pendingCalls[call.to]; // Cleanup
+    }
+  });
+
+  socket.on("reject-call", ({ callId }) => {
+    const call = Object.values(pendingCalls).find((c) => c.callId === callId);
+    if (call) {
+      // Notify Aniket that Mick rejected
+      const fromSocketId = userSocketMap[call.from];
+      if (fromSocketId) {
+        io.to(fromSocketId).emit("call-rejected");
+      }
+      delete pendingCalls[call.to]; // Cleanup
+    }
+  });
   
 });
 
