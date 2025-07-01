@@ -94,27 +94,27 @@ io.on("connection", (socket) => {
     }
   });
 
-  // New: Request call initiation (User1 -> User2)
-  socket.on("request-call", ({ from, to }) => {
-    console.log(`Call request from ${from} to ${to}`);
-    console.log('Current userSocketMap:', userSocketMap);
-    const targetSocketId = userSocketMap[to];
-    if (targetSocketId) {
-      console.log(`Sending to socket ${targetSocketId}`);
-      io.to(targetSocketId).emit("incoming-call-request", { from });
-    } else {
-      console.error(`Target user ${to} not found in:`);
-      console.dir(userSocketMap, { depth: null });
-    }
-  });
+  // // New: Request call initiation (User1 -> User2)
+  // socket.on("request-call", ({ from, to }) => {
+  //   console.log(`Call request from ${from} to ${to}`);
+  //   console.log('Current userSocketMap:', userSocketMap);
+  //   const targetSocketId = userSocketMap[to];
+  //   if (targetSocketId) {
+  //     console.log(`Sending to socket ${targetSocketId}`);
+  //     io.to(targetSocketId).emit("incoming-call-request", { from });
+  //   } else {
+  //     console.error(`Target user ${to} not found in:`);
+  //     console.dir(userSocketMap, { depth: null });
+  //   }
+  // });
 
-  // New: Handle response to call request (User2 -> Server)
-  socket.on("call-response", ({ from, to, accepted }) => {
-    const targetSocketId = userSocketMap[to];
-    if (targetSocketId) {
-      io.to(targetSocketId).emit("call-response", { from, accepted });
-    }
-  });
+  // // New: Handle response to call request (User2 -> Server)
+  // socket.on("call-response", ({ from, to, accepted }) => {
+  //   const targetSocketId = userSocketMap[to];
+  //   if (targetSocketId) {
+  //     io.to(targetSocketId).emit("call-response", { from, accepted });
+  //   }
+  // });
   
 });
 
