@@ -25,22 +25,6 @@ io.on("connection", (socket) => {
     console.log(`User registered: ${userId} => ${socket.id}`);
   });
 
-  // New: Request call initiation (User1 -> User2)
-  socket.on("request-call", ({ from, to }) => {
-    const targetSocketId = userSocketMap[to];
-    if (targetSocketId) {
-      io.to(targetSocketId).emit("incoming-call-request", { from });
-    }
-  });
-
-  // New: Handle response to call request (User2 -> Server)
-  socket.on("call-response", ({ from, to, accepted }) => {
-    const targetSocketId = userSocketMap[to];
-    if (targetSocketId) {
-      io.to(targetSocketId).emit("call-response", { from, accepted });
-    }
-  });
-  
   socket.on("ready-for-call", ({ userId, matchId }) => {
     if (!callReadyMap[matchId]) callReadyMap[matchId] = new Set();
     callReadyMap[matchId].add(userId);
@@ -100,6 +84,24 @@ io.on("connection", (socket) => {
       }
     }
   });
+
+  // New: Request call initiation (User1 -> User2)
+  socket.on("request-call", ({ from, to }) => {
+    console.log(`Call request from ${from} to ${to}`);
+    const targetSocketId = userSocketMap[to];
+    if (targetSocketId) {
+      io.to(targetSocketId).emit("incoming-call-request", { from });
+    }
+  });
+
+  // New: Handle response to call request (User2 -> Server)
+  socket.on("call-response", ({ from, to, accepted }) => {
+    const targetSocketId = userSocketMap[to];
+    if (targetSocketId) {
+      io.to(targetSocketId).emit("call-response", { from, accepted });
+    }
+  });
+  
 });
 
 const PORT = 5050;
