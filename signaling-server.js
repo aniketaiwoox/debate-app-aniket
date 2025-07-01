@@ -23,13 +23,13 @@ const io = new Server(server, {
   transports: ["websocket", "polling"],
 });
 
+// ===== 1. random debate  ===== //
+const randomDebateNamespace = io.of("/random-debate");
 const userSocketMap = {}; // Maps userId -> socket.id
 const callReadyMap = {}; // matchId -> Set of userIds
-//new
-const pendingCalls = {}; // Tracks { mickUserId: { callId, from: aniketUserId, offer } }
 
-io.on("connection", (socket) => {
-  console.log("User connected:", socket.id);
+randomDebateNamespace.on("connection", (socket) => {
+  console.log("User connected to random debate namespace:", socket.id);
 
   socket.on("register", (userId) => {
     userSocketMap[userId] = socket.id;
@@ -95,65 +95,14 @@ io.on("connection", (socket) => {
       }
     }
   });
+});
 
-  // // New: Request call initiation (User1 -> User2)
-  // socket.on("request-call", ({ from, to }) => {
-  //   console.log(`Call request from ${from} to ${to}`);
-  //   console.log('Current userSocketMap:', userSocketMap);
-  //   const targetSocketId = userSocketMap[to];
-  //   if (targetSocketId) {
-  //     console.log(`Sending to socket ${targetSocketId}`);
-  //     io.to(targetSocketId).emit("incoming-call-request", { from });
-  //   } else {
-  //     console.error(`Target user ${to} not found in:`);
-  //     console.dir(userSocketMap, { depth: null });
-  //   }
-  // });
+// ===== 2. one-on-one debate ===== //
+const oneToOneNamespace = io.of("/one-to-one");
 
-  // // New: Handle response to call request (User2 -> Server)
-  // socket.on("call-response", ({ from, to, accepted }) => {
-  //   const targetSocketId = userSocketMap[to];
-  //   if (targetSocketId) {
-  //     io.to(targetSocketId).emit("call-response", { from, accepted });
-  //   }
-  // });
-
-  //new
-  socket.on("initiate-call", ({ to, offer, callId, from }) => {
-    pendingCalls[to] = { callId, from, offer };
-    const targetSocketId = userSocketMap[to];
-    if (targetSocketId) {
-      io.to(targetSocketId).emit("incoming-call", { callId, from, offer });
-    } else {
-      console.log(`User ${to} not connected`);
-    }
-  });
-
-  socket.on("accept-call", ({ callId, answer }) => {
-    // Find the call by ID
-    const call = Object.values(pendingCalls).find((c) => c.callId === callId);
-    if (call) {
-      // Notify Aniket that Mick accepted
-      const fromSocketId = userSocketMap[call.from];
-      if (fromSocketId) {
-        io.to(fromSocketId).emit("call-accepted", { answer });
-      }
-      delete pendingCalls[call.to]; // Cleanup
-    }
-  });
-
-  socket.on("reject-call", ({ callId }) => {
-    const call = Object.values(pendingCalls).find((c) => c.callId === callId);
-    if (call) {
-      // Notify Aniket that Mick rejected
-      const fromSocketId = userSocketMap[call.from];
-      if (fromSocketId) {
-        io.to(fromSocketId).emit("call-rejected");
-      }
-      delete pendingCalls[call.to]; // Cleanup
-    }
-  });
-  
+oneToOneNamespace.on("connection", (socket) => {
+  console.log("User connected to one to one namespace:", socket.id);
+ 
 });
 
 const PORT = 5050;
