@@ -11,6 +11,7 @@ app.use(
     credentials: true,
   })
 );
+app.use(express.json());
 
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -23,8 +24,10 @@ const io = new Server(server, {
   transports: ["websocket", "polling"],
 });
 
-const userSocketMap = {}; // Maps userId -> socket.id
-const callReadyMap = {}; // matchId -> Set of userIds
+require("./server")(app, io);
+
+const userSocketMap = {};
+const callReadyMap = {};
 
 io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
@@ -93,10 +96,6 @@ io.on("connection", (socket) => {
       }
     }
   });
-
-
-
-  
 });
 
 const PORT = 5050;
