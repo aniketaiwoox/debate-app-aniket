@@ -30,11 +30,11 @@ const userSocketMap = {};
 const callReadyMap = {};
 
 io.on("connection", (socket) => {
-  console.log("User connected:", socket.id);
+ // console.log("User connected:", socket.id);
 
   socket.on("register", (userId) => {
     userSocketMap[userId] = socket.id;
-    console.log(`User registered: ${userId} => ${socket.id}`);
+   // console.log(`User registered: ${userId} => ${socket.id}`);
   });
 
   socket.on("ready-for-call", ({ userId, matchId }) => {
@@ -85,7 +85,7 @@ io.on("connection", (socket) => {
     );
     if (userId) {
       delete userSocketMap[userId];
-      console.log(`User disconnected: ${userId}`);
+   //   console.log(`User disconnected: ${userId}`);
 
       // Cleanup callReadyMap entries
       for (const matchId in callReadyMap) {
