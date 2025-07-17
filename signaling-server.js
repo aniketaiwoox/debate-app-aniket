@@ -82,9 +82,7 @@ io.on("connection", (socket) => {
     const targetSocketId = userSocketMap[to];
     if (targetSocketId) {
       io.to(targetSocketId).emit("call-answered", { answer });
-      console.log(
-        `[CALL ACCEPTED] User ${answererId} accepted call from ${to}`
-      );
+      console.log(`[CALL ACCEPTED] User ${answer} accepted call from ${to}`);
     } else {
       console.log(`[ANSWER FAILED] Caller ${to} not found`);
     }
