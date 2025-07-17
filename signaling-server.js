@@ -4,18 +4,37 @@ const cors = require("cors");
 const { Server } = require("socket.io");
 
 const app = express();
+// app.use(
+//   cors({
+//     origin: "https://aiwoox.in",
+//     methods: "GET,POST",
+//     credentials: true,
+//   })
+// );
 app.use(
   cors({
-    origin: "https://aiwoox.in",
-    methods: "GET,POST",
+    origin: allowedOrigin,
+    methods: ["GET", "POST"],
     credentials: true,
   })
 );
 
+
+// const server = http.createServer(app);
+// const io = new Server(server, {
+//   cors: {
+//     origin: ["https://aiwoox.in"],
+//     methods: ["GET", "POST"],
+//     allowedHeaders: ["Content-Type", "Authorization"],
+//     credentials: true,
+//   },
+//   transports: ["websocket", "polling"],
+// });
+
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: ["https://aiwoox.in"],
+    origin: allowedOrigin,
     methods: ["GET", "POST"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
@@ -49,9 +68,12 @@ io.on("connection", (socket) => {
   });
 
   socket.on("call-user", ({ to, offer, from }) => {
+    console.log(`[CALL INITIATED] User ${from} is calling user ${to}`);
     const targetSocketId = userSocketMap[to];
     if (targetSocketId) {
       io.to(targetSocketId).emit("incoming-call", { from, offer });
+    } else {
+      console.log(`[CALL FAILED] Target user ${to} not found`);
     }
   });
 
@@ -59,6 +81,11 @@ io.on("connection", (socket) => {
     const targetSocketId = userSocketMap[to];
     if (targetSocketId) {
       io.to(targetSocketId).emit("call-answered", { answer });
+      console.log(
+        `[CALL ACCEPTED] User ${answererId} accepted call from ${to}`
+      );
+    } else {
+      console.log(`[ANSWER FAILED] Caller ${to} not found`);
     }
   });
 
