@@ -7,7 +7,7 @@ const app = express();
 app.use(
   cors({
     origin: "https://aiwoox.in",
-    methods: "GET,POST",
+    methods: ["GET", "POST"],
     credentials: true,
   })
 );
@@ -23,7 +23,7 @@ app.use(
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: ["https://aiwoox.in"],
+    origin: "https://aiwoox.in",
     methods: ["GET", "POST"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
