@@ -12,6 +12,14 @@ const app = express();
 //   })
 // );
 const allowedOrigins = ["https://aiwoox.in"];
+app.options(
+  "*",
+  cors({
+    origin: allowedOrigins,
+    methods: ["GET", "POST"],
+    credentials: true,
+  })
+);
 app.use(
   cors({
     origin: allowedOrigins,
