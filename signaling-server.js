@@ -28,14 +28,6 @@ const io = new Server(server, {
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   },
-  // Add these critical options:
-  allowEIO3: true, // For Socket.IO v2/v3 compatibility
-  connectionStateRecovery: {
-    maxDisconnectionDuration: 2 * 60 * 1000, // 2 minutes
-    skipMiddlewares: true,
-  },
-  pingTimeout: 60000,
-  pingInterval: 25000,
   transports: ["websocket", "polling"],
 });
 
